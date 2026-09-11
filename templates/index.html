@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GCP Cloud Horizons Summit 2026 - Join us for a 1-day premium technical conference focusing on serverless, GenAI, databases, streaming analytics, and cloud security.">
+    <title>{{ conference.title }} - 1-Day Technical Conference</title>
+    <!-- Google Fonts for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for modern icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <!-- Background glowing accents -->
+    <div class="glow-accent blue" aria-hidden="true"></div>
+    <div class="glow-accent yellow" aria-hidden="true"></div>
+    <div class="glow-accent green" aria-hidden="true"></div>
+    <div class="glow-accent red" aria-hidden="true"></div>
+
+    <header class="app-header">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fa-solid fa-cloud logo-icon"></i>
+                <span class="logo-text">GCP Horizons <span class="logo-year">2026</span></span>
+            </div>
+            <div class="header-meta">
+                <div class="meta-item">
+                    <i class="fa-regular fa-calendar-days"></i>
+                    <div>
+                        <span class="meta-label">Date</span>
+                        <span class="meta-value">{{ conference.date }}</span>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <div>
+                        <span class="meta-label">Location</span>
+                        <span class="meta-value">{{ conference.location }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-tag">Google Cloud Technologies</div>
+            <h1 class="hero-title">{{ conference.title }}</h1>
+            <p class="hero-desc">{{ conference.description }}</p>
+            
+            <!-- Quick Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <span class="stat-number">8</span>
+                    <span class="stat-label">In-depth Talks</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">11</span>
+                    <span class="stat-label">Expert Speakers</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">60</span>
+                    <span class="stat-label">Min Lunch Break</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">1</span>
+                    <span class="stat-label">Incredible Day</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Filters & Search -->
+        <section class="filter-section">
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="search-input" placeholder="Search by talk title, speaker name, or keywords..." aria-label="Search schedule">
+                <button id="clear-search" class="clear-btn" aria-label="Clear search" style="display: none;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="filter-pill-container" id="category-filters" role="group" aria-label="Filter talks by category">
+                <button class="filter-pill active" data-category="all" id="filter-all">
+                    <span class="pill-dot"></span> All Sessions
+                </button>
+                <button class="filter-pill" data-category="Developer" id="filter-dev">
+                    <span class="pill-dot blue-dot"></span> Developer
+                </button>
+                <button class="filter-pill" data-category="AI & Machine Learning" id="filter-ai">
+                    <span class="pill-dot yellow-dot"></span> AI & ML
+                </button>
+                <button class="filter-pill" data-category="Data & Analytics" id="filter-data">
+                    <span class="pill-dot green-dot"></span> Data & Analytics
+                </button>
+                <button class="filter-pill" data-category="Security" id="filter-security">
+                    <span class="pill-dot red-dot"></span> Security
+                </button>
+                <button class="filter-pill" data-category="Infrastructure" id="filter-infra">
+                    <span class="pill-dot purple-dot"></span> Infrastructure
+                </button>
+            </div>
+        </section>
+
+        <!-- Schedule / Timetable Section -->
+        <section class="schedule-section">
+            <div class="schedule-timeline-line"></div>
+            <div class="timeline-container" id="timeline-container">
+                {% for item in timetable %}
+                    {% if item.type == 'talk' %}
+                        <!-- Talk Card -->
+                        <div class="timeline-item talk-item" 
+                             data-type="talk" 
+                             data-id="{{ item.id }}"
+                             data-title="{{ item.title | lower }}"
+                             data-categories="{{ item.categories | join(',') | lower }}"
+                             data-speakers="{% for sp in item.speakers %}{{ sp.first_name | lower }} {{ sp.last_name | lower }} {% endfor %}">
+                            
+                            <div class="timeline-marker">
+                                <div class="marker-dot"></div>
+                            </div>
+                            
+                            <div class="timeline-time">{{ item.time }}</div>
+                            
+                            <div class="timeline-card talk-card" onclick="openTalkModal({{ item.id }})" tabindex="0" role="button" aria-label="View details for {{ item.title }}">
+                                <div class="card-header">
+                                    <div class="tag-list">
+                                        {% for cat in item.categories %}
+                                            <span class="category-tag tag-{{ cat | replace(' ', '-') | replace('&', 'and') | lower }}">{{ cat }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="talk-id">#Talk-0{{ item.id }}</div>
+                                </div>
+                                <h3 class="talk-title">{{ item.title }}</h3>
+                                <p class="talk-summary">{{ item.description[:140] }}...</p>
+                                
+                                <div class="card-footer">
+                                    <div class="speakers-avatars">
+                                        {% for speaker in item.speakers %}
+                                            <div class="avatar-wrapper" title="{{ speaker.first_name }} {{ speaker.last_name }}">
+                                                <img src="{{ speaker.avatar }}" alt="{{ speaker.first_name }} {{ speaker.last_name }}">
+                                            </div>
+                                        {% endfor %}
+                                        <span class="speakers-names">
+                                            {% for speaker in item.speakers %}
+                                                {{ speaker.first_name }} {{ speaker.last_name }}{% if not loop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </span>
+                                    </div>
+                                    <div class="action-hint">
+                                        <span>View Details</span> <i class="fa-solid fa-arrow-right"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% elif item.type == 'lunch' %}
+                        <!-- Lunch Break -->
+                        <div class="timeline-item special-item lunch-item" data-type="lunch">
+                            <div class="timeline-marker">
+                                <div class="marker-icon"><i class="fa-solid fa-utensils"></i></div>
+                            </div>
+                            <div class="timeline-time">{{ item.time }}</div>
+                            <div class="timeline-card special-card lunch-card">
+                                <div class="special-card-badge"><i class="fa-solid fa-mug-hot"></i> 60 Min Break</div>
+                                <h3 class="special-title">{{ item.title }}</h3>
+                                <p class="special-desc">{{ item.description }}</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Regular Break / Event -->
+                        <div class="timeline-item special-item break-item" data-type="break">
+                            <div class="timeline-marker">
+                                <div class="marker-icon">
+                                    {% if 'coffee' in item.title | lower or 'welcome' in item.title | lower %}
+                                        <i class="fa-solid fa-mug-saucer"></i>
+                                    {% else %}
+                                        <i class="fa-solid fa-comments"></i>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="timeline-time">{{ item.time }}</div>
+                            <div class="timeline-card special-card break-card">
+                                <h3 class="special-title">{{ item.title }}</h3>
+                                <p class="special-desc">{{ item.description }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- No Results State -->
+                <div class="no-results" id="no-results-msg" style="display: none;">
+                    <i class="fa-regular fa-calendar-times"></i>
+                    <h3>No Sessions Found</h3>
+                    <p>Try adjusting your search terms or selecting a different category filter.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Details Modal -->
+    <div class="modal-backdrop" id="talk-modal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-container">
+            <button class="modal-close-btn" id="modal-close" aria-label="Close modal" onclick="closeTalkModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="modal-content" id="modal-content-area">
+                <!-- Content is injected dynamically by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <footer class="app-footer">
+        <div class="footer-container">
+            <p>&copy; 2026 GCP Horizons. All rights reserved. Designed for Google Cloud Builders.</p>
+            <div class="footer-links">
+                <a href="https://cloud.google.com" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-cloud"></i> Google Cloud Website</a>
+                <a href="#" id="view-api-link"><i class="fa-solid fa-code"></i> Developer API</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script imports -->
+    <script>
+        // Pass server side data to frontend for instant details rendering without latency
+        const TALKS_DATA = {{ talks | tojson | safe }};
+    </script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
